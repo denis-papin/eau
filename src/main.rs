@@ -110,7 +110,7 @@ fn calculate_flow_rate(data: &Vec<Data>) -> Vec<(NaiveDate,f64)> {
 }
 
 fn main() {
-    let ds = read_data(r#"C:\Users\denis\Dropbox\Personnel\Tableau_Conso_Eau.txt"#).unwrap();
+    let ds = read_data(r#".\Tableau_Conso_Eau.txt"#).unwrap();
     let flow = calculate_flow_rate(&ds);
     println!("Hello, world! {:#?}", &ds);
     println!("Flow {:#?}", &flow);
