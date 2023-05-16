@@ -1,36 +1,35 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use anyhow::anyhow;
-use chrono::{FixedOffset, NaiveDate, ParseResult};
+
 
 #[derive(Debug)]
 struct Data {
     date: NaiveDate,
     heure: String,
-    ext: Option<f32>,
+    _ext: Option<f32>,
     int: Option<f32>,
 }
 
-use chrono::{DateTime, NaiveTime, ParseError, Utc};
+use chrono::{NaiveDate};
 
-fn parse_time(s: &str) -> ParseResult<NaiveTime> {
-    NaiveTime::parse_from_str(s, "%H:%M")
+// fn parse_time(s: &str) -> ParseResult<NaiveTime> {
+//     NaiveTime::parse_from_str(s, "%H:%M")
+//
+//     // dbg!(&time);
+//     // let date = Utc::today().naive_utc();
+//     // dbg!(&date);
+//     // DateTime::parse_from_str(&format!("{} {}", date, time), "%Y-%m-%d %H:%M:%S %Z")
+// }
 
-    // dbg!(&time);
-    // let date = Utc::today().naive_utc();
-    // dbg!(&date);
-    // DateTime::parse_from_str(&format!("{} {}", date, time), "%Y-%m-%d %H:%M:%S %Z")
-}
 
-
-fn difference_in_hours(start: &str, end: &str) -> anyhow::Result<f64> {
-    let start_time = parse_time(start)?;
-    dbg!(&start_time);
-    let end_time = parse_time(end)?;
-    dbg!(&end_time);
-    let duration = end_time - start_time;
-    Ok(duration.num_seconds() as f64 / 3600.0)
-}
+// fn difference_in_hours(start: &str, end: &str) -> anyhow::Result<f64> {
+//     let start_time = parse_time(start)?;
+//     dbg!(&start_time);
+//     let end_time = parse_time(end)?;
+//     dbg!(&end_time);
+//     let duration = end_time - start_time;
+//     Ok(duration.num_seconds() as f64 / 3600.0)
+// }
 
 
 fn read_data(filename: &str) -> anyhow::Result<Vec<Data>> {
@@ -44,7 +43,7 @@ fn read_data(filename: &str) -> anyhow::Result<Vec<Data>> {
 
     for line in lines {
         let line = line.unwrap();
-        println!("{}", &line);
+        // println!("{}", &line);
         let items: Vec<&str> = line
             .split(';')
             .map(|s| s.trim())
@@ -53,7 +52,7 @@ fn read_data(filename: &str) -> anyhow::Result<Vec<Data>> {
             .map(|(_, s)| s)
             .collect();
 
-        println!("{:#?}", &items);
+        // println!("{:#?}", &items);
 
         if items.len() < 4 {
             //return Err(anyhow!(""));
@@ -68,7 +67,7 @@ fn read_data(filename: &str) -> anyhow::Result<Vec<Data>> {
         let data = Data {
             date/*: Default::default()*/,
             heure/*: "".to_string()*/,
-            ext,
+            _ext: ext,
             int,
         };
 
@@ -79,20 +78,19 @@ fn read_data(filename: &str) -> anyhow::Result<Vec<Data>> {
 }
 
 
-use chrono::{Duration};
 
 fn calculate_flow_rate(data: &Vec<Data>) -> Vec<(NaiveDate,f64)> {
     // Initialize variables
 
     let first_date = data.get(0).unwrap().date;
-    let first_time = &data.get(0).unwrap().heure;
-    let mut first_value = data.get(0).unwrap().int.unwrap();
+    let _first_time = &data.get(0).unwrap().heure;
+    let first_value = data.get(0).unwrap().int.unwrap();
     let mut flow_rates = vec![(first_date,0.0_f64); data.len()];
 
     // Iterate over the data and calculate flow rates
     for (i, d) in data.iter().enumerate() {
 
-        let offset = difference_in_hours(&d.heure, first_time);
+        // let offset = difference_in_hours(&d.heure, first_time);
 
         // Parse the date from the string
         let date = d.date; // NaiveDate::parse_from_str(&d.date, "%d/%m/%Y").unwrap();
@@ -112,10 +110,15 @@ fn calculate_flow_rate(data: &Vec<Data>) -> Vec<(NaiveDate,f64)> {
 fn main() {
     let ds = read_data(r#".\Tableau_Conso_Eau.txt"#).unwrap();
     let flow = calculate_flow_rate(&ds);
-    println!("Hello, world! {:#?}", &ds);
-    println!("Flow {:#?}", &flow);
+    // println!("Hello, world! {:#?}", &ds);
 
-    let a = difference_in_hours("13:30", "14:00");
+    // println!("Flow {:#?}", &flow);
 
-    println!("{}", a.unwrap());
+    for f in &flow {
+        let str_cube = format!("{:.1} \t m3/an", &f.1).replace(".", ",");
+        println!("{:#?}\t{}", &f.0, &str_cube);
+    }
+
+    // let a = difference_in_hours("13:30", "14:00");
+    // println!("{}", a.unwrap());
 }
