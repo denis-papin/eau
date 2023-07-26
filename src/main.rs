@@ -110,8 +110,6 @@ fn calculate_flow_rate(data: &Vec<Data>) -> Vec<(NaiveDate,f64, Option<f64>)> {
                 local_flow_rate = Some(volume as f64 / time_interval.num_days() as f64);
             }
 
-
-
             ///
             let volume = value - first_value;
             let flow_rate = (volume as f64 / time_interval.num_days() as f64) * 365.0;
